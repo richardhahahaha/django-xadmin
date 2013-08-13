@@ -107,6 +107,7 @@ class BookmarkPlugin(BaseAdminPlugin):
             'bk_list_base_url': list_base_url,
             'bk_post_url': post_url,
             'has_add_permission_bookmark': self.admin_view.request.user.has_perm('xadmin.add_bookmark'),
+            'has_add_bookmark_permission': self.admin_view.request.user.has_perm('xadmin.add_bookmark'),
             'has_change_permission_bookmark': self.admin_view.request.user.has_perm('xadmin.change_bookmark')
         }
         context.update(new_context)

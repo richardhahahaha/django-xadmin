@@ -137,7 +137,11 @@ class ModelFormAdminView(ModelAdminView):
 
     @filter_hook
     def instance_forms(self):
-        self.form_obj = self.model_form(**self.get_form_datas())
+        param = self.get_form_datas()
+        if 'initial' in param:
+             param['initial']['_request'] = self.request
+        self.form_obj = self.model_form(**param)
+        self.form_obj._request = self.request
 
     def setup_forms(self):
         helper = self.get_form_helper()

@@ -375,12 +375,12 @@ class QuickBtnWidget(BaseWidget):
             btn = {}
             if 'model' in b:
                 model = self.get_model(b['model'])
-                if not self.user.has_perm("%s.view_%s" % (model._meta.app_label, model._meta.module_name)):
+                if not self.user.has_perm("%s.%s_%s" % (model._meta.app_label, b.get('view', 'view'), model._meta.module_name)):
                     continue
                 btn['url'] = reverse("%s:%s_%s_%s" % (self.admin_site.app_name, model._meta.app_label,
                                                       model._meta.module_name, b.get('view', 'changelist')))
-                btn['title'] = model._meta.verbose_name
-                btn['icon'] = self.dashboard.get_model_icon(model)
+                btn['title'] = b.get('title', model._meta.verbose_name)
+                btn['icon'] = b.get('icon', self.dashboard.get_model_icon(model))
             else:
                 btn['url'] = b['url']
 

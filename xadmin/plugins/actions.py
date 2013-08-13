@@ -13,6 +13,7 @@ from xadmin.sites import site
 from xadmin.util import model_format_dict, get_deleted_objects, model_ngettext
 from xadmin.views import BaseAdminPlugin, ListAdminView
 from xadmin.views.base import filter_hook, ModelAdminView
+from xadmin.perm import filter_by_permission, has_permission_for_obj
 
 
 ACTION_CHECKBOX_NAME = '_selected_action'
@@ -75,6 +76,9 @@ class DeleteSelectedAction(BaseActionView):
 
         using = router.db_for_write(self.model)
 
+        queryset = filter_by_permission(self.user, queryset, 'delete')
+        if not queryset:
+            raise PermissionDenied
         # Populate deletable_objects, a data structure of all related objects that
         # will also be deleted.
         deletable_objects, perms_needed, protected = get_deleted_objects(
