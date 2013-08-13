@@ -26,7 +26,7 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import View
 from xadmin.util import static, json, vendor, sortkeypicker
-
+from xadmin.perm import filter_by_permission, has_permission_for_obj
 
 csrf_protect_m = method_decorator(csrf_protect)
 
@@ -472,12 +472,16 @@ class ModelAdminView(CommAdminView):
         ``add``, ``change``, and ``delete`` mapping to the True/False for each
         of those actions.
         """
-        return {
+        perm = {
             'view': self.has_view_permission(),
             'add': self.has_add_permission(),
             'change': self.has_change_permission(),
             'delete': self.has_delete_permission(),
         }
+
+        for p in self.model._meta.permissions:
+            perm[p[0]] = self.user.has_perm(self.model._meta.app_label + '.' + p[0] + '_' + self.model._meta.object_name.lower())
+        return perm
 
     def get_template_list(self, template_name):
         opts = self.opts
@@ -499,9 +503,11 @@ class ModelAdminView(CommAdminView):
         Returns a QuerySet of all model instances that can be edited by the
         admin site. This is used by changelist_view.
         """
-        return self.model._default_manager.get_query_set()
+        return filter_by_permission(self.user, self.model._default_manager.get_query_set(), 'view')
 
     def has_view_permission(self, obj=None):
+        if obj:
+            return has_permission_for_obj(self.user, obj, 'view')
         return self.user.has_perm('%s.view_%s' % self.model_info) or \
             self.user.has_perm('%s.change_%s' % self.model_info)
 
@@ -509,7 +515,11 @@ class ModelAdminView(CommAdminView):
         return self.user.has_perm('%s.add_%s' % self.model_info)
 
     def has_change_permission(self, obj=None):
+        if obj:
+            return has_permission_for_obj(self.user, obj, 'change')
         return self.user.has_perm('%s.change_%s' % self.model_info)
 
     def has_delete_permission(self, obj=None):
+        if obj:
+            return has_permission_for_obj(self.user, obj, 'delete')
         return self.user.has_perm('%s.delete_%s' % self.model_info)
