@@ -174,9 +174,10 @@ class ActionPlugin(BaseAdminPlugin):
             else:
                 ac, name, description, icon = self.actions[action]
                 select_across = request.POST.get('select_across', False) == '1'
+                select_row = [pk for pk in request.POST.getlist('select_row') if pk]
                 selected = request.POST.getlist(ACTION_CHECKBOX_NAME)
 
-                if not selected and not select_across:
+                if not selected and not select_across and not select_row:
                     # Reminder that something needs to be selected or nothing will happen
                     msg = _("Items must be selected in order to perform "
                             "actions on them. No items have been changed.")
@@ -185,7 +186,10 @@ class ActionPlugin(BaseAdminPlugin):
                     queryset = av.list_queryset._clone()
                     if not select_across:
                         # Perform the action only on the selected objects
-                        queryset = av.list_queryset.filter(pk__in=selected)
+			if select_row:
+                        	queryset = av.list_queryset.filter(pk__in=select_row)
+			else:
+	                        queryset = av.list_queryset.filter(pk__in=selected)
                     action_view = self.get_model_view(ac, av.model)
                     action_view.init_action(av)
                     response = action_view.do_action(queryset)

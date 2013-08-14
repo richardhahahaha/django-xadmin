@@ -107,7 +107,11 @@
         selectedClass: "warning"
     }
 
-    $.do_action = function(name){
+    $.do_action = function(name, pk){
+      if(pk){
+          $('#changelist-form #select-row').val(pk)
+      }else
+          $('#changelist-form #select-row').val('')
       $('#action').val(name);
       $('#changelist-form').submit();
     }
