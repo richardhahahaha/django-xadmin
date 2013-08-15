@@ -29,11 +29,11 @@ class GroupAdmin(object):
 
 class UserAdmin(object):
     change_user_password_template = None
-    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_superuser', 'groups')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
-    style_fields = {'user_permissions': 'm2m_transfer'}
+    style_fields = {'user_permissions': 'm2m_transfer', 'groups': 'm2m_dropdown'}
     model_icon = 'user'
 
     def get_model_form(self, **kwargs):
@@ -76,7 +76,7 @@ class PermissionAdmin(object):
 
 site.register(Group, GroupAdmin)
 site.register(User, UserAdmin)
-site.register(Permission, PermissionAdmin)
+#site.register(Permission, PermissionAdmin)
 
 
 class UserFieldPlugin(BaseAdminPlugin):
