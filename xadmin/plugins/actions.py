@@ -36,6 +36,7 @@ class BaseActionView(ModelAdminView):
 
     model_perm = 'change'
     only_for_one = False
+    btn_class = 'btn-success'
 
     @classmethod
     def has_perm(cls, list_view):
@@ -59,6 +60,7 @@ class DeleteSelectedAction(BaseActionView):
     delete_selected_confirmation_template = None
 
     model_perm = 'delete'
+    btn_class = 'btn-danger'
 
     @filter_hook
     def delete_models(self, queryset):
@@ -186,10 +188,10 @@ class ActionPlugin(BaseAdminPlugin):
                     queryset = av.list_queryset._clone()
                     if not select_across:
                         # Perform the action only on the selected objects
-			if select_row:
-                        	queryset = av.list_queryset.filter(pk__in=select_row)
-			else:
-	                        queryset = av.list_queryset.filter(pk__in=selected)
+                        if select_row:
+                            queryset = av.list_queryset.filter(pk__in=select_row)
+                        else:
+                            queryset = av.list_queryset.filter(pk__in=selected)
                     action_view = self.get_model_view(ac, av.model)
                     action_view.init_action(av)
                     response = action_view.do_action(queryset)
@@ -234,7 +236,7 @@ class ActionPlugin(BaseAdminPlugin):
         choices = []
         for ac, name, description, icon in self.actions.itervalues():
             if not ac.only_for_one:
-                choice = (name, description % model_format_dict(self.opts), icon)
+                choice = (name, description % model_format_dict(self.opts), icon, ac.btn_class)
                 choices.append(choice)
         return choices
 
