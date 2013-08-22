@@ -249,7 +249,7 @@ class BaseAdminView(BaseAdminObject, View):
         # take name and docstring from class
         update_wrapper(view, cls, updated=())
         view.need_site_permission = cls.need_site_permission
-        
+
         return view
 
     def init_request(self, *args, **kwargs):
@@ -509,7 +509,8 @@ class ModelAdminView(CommAdminView):
         }
 
         for p in self.model._meta.permissions:
-            perm[p[0]] = self.user.has_perm(self.model._meta.app_label + '.' + p[0] + '_' + self.model._meta.object_name.lower())
+            code = p[0][:-1-len(self.model._meta.object_name)]
+            perm[code] = self.user.has_perm(self.model._meta.app_label + '.' + p[0])
         return perm
 
     def get_template_list(self, template_name):
