@@ -480,7 +480,8 @@ class ModelAdminView(CommAdminView):
         }
 
         for p in self.model._meta.permissions:
-            perm[p[0]] = self.user.has_perm(self.model._meta.app_label + '.' + p[0] + '_' + self.model._meta.object_name.lower())
+            code = p[0][:-1-len(self.model._meta.object_name)]
+            perm[code] = self.user.has_perm(self.model._meta.app_label + '.' + p[0])
         return perm
 
     def get_template_list(self, template_name):
