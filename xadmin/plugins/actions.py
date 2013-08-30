@@ -35,6 +35,7 @@ class BaseActionView(ModelAdminView):
     icon = 'remove'
 
     model_perm = 'change'
+    only_for_one = False
     btn_class = 'btn-success'
 
     @classmethod
@@ -235,8 +236,9 @@ class ActionPlugin(BaseAdminPlugin):
         """
         choices = []
         for ac, name, description, icon in self.actions.itervalues():
-            choice = (name, description % model_format_dict(self.opts), icon, ac.btn_class)
-            choices.append(choice)
+            if not ac.only_for_one:
+                choice = (name, description % model_format_dict(self.opts), icon, ac.btn_class)
+                choices.append(choice)
         return choices
 
     def get_action(self, action):
